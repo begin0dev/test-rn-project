@@ -76,6 +76,8 @@ function RankScreen() {
         onIndexChange={setIndex}
         navigationState={{ index, routes }}
         swipeEnabled
+        lazyPreloadDistance={1}
+        lazy
       />
       <TouchableWithoutFeedback>
         <Animated.View style={[styles.scrollTop, { opacity }]}>
