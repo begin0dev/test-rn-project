@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useContext, useRef, useState } from 'react';
+import { useContext, useRef, useState, forwardRef } from 'react';
 import {
   Dimensions,
   FlatList,
@@ -22,39 +22,47 @@ interface IProps {
   onScrollEndDrag: (e: NativeSyntheticEvent<NativeScrollEvent>) => void;
 }
 
-function ProductRank({ isActive, paddingTop, onScrollBeginDrag, onScrollEndDrag }: IProps) {
-  const { scrollAnim } = useContext(CustomHeaderContext);
+const ProductRank = forwardRef<FlatList, IProps>(
+  ({ isActive, paddingTop, onScrollBeginDrag, onScrollEndDrag }, ref) => {
+    const { scrollAnim } = useContext(CustomHeaderContext);
 
-  const flatListEl = useRef<FlatList>(null);
+    // const flatListEl = useRef<FlatList>(null);
 
-  const [products, setProducts] = useState<{ id: number }[]>(
-    Array(200)
-      .fill(0)
-      .map((zero, id) => ({ id })),
-  );
+    const [products, setProducts] = useState<{ id: number }[]>(
+      Array(200)
+        .fill(0)
+        .map((zero, id) => ({ id })),
+    );
 
-  return (
-    <Animated.FlatList
-      ref={flatListEl}
-      data={products}
-      keyExtractor={(item) => `product_${item.id}`}
-      renderItem={({ item, index }) => <ProductCard product={item} colCount={2} index={index} />}
-      contentContainerStyle={{ paddingTop }}
-      showsVerticalScrollIndicator={false}
-      onScroll={
-        isActive
-          ? Animated.event([{ nativeEvent: { contentOffset: { y: scrollAnim } } }], {
-              useNativeDriver: true,
-            })
-          : undefined
-      }
-      onScrollBeginDrag={onScrollBeginDrag}
-      onScrollEndDrag={onScrollEndDrag}
-      onMomentumScrollEnd={onScrollEndDrag}
-      onEndReachedThreshold={2.5}
-      numColumns={colCount}
-    />
-  );
-}
+    return (
+      <Animated.FlatList
+        ref={ref}
+        data={products}
+        keyExtractor={(item) => `product_${item.id}`}
+        renderItem={({ item, index }) => <ProductCard product={item} colCount={2} index={index} />}
+        contentContainerStyle={{ paddingTop }}
+        showsVerticalScrollIndicator={false}
+        onScroll={
+          isActive
+            ? Animated.event([{ nativeEvent: { contentOffset: { y: scrollAnim } } }], {
+                useNativeDriver: true,
+              })
+            : undefined
+        }
+        onScrollBeginDrag={onScrollBeginDrag}
+        onScrollEndDrag={(e) => {
+          console.log('onScrollEndDrag');
+          onScrollEndDrag(e);
+        }}
+        onMomentumScrollEnd={(e) => {
+          console.log('onMomentumScrollEnd');
+          onScrollEndDrag(e);
+        }}
+        onEndReachedThreshold={2.5}
+        numColumns={colCount}
+      />
+    );
+  },
+);
 
 export default ProductRank;

@@ -7,6 +7,7 @@ import {
   Dimensions,
   NativeSyntheticEvent,
   NativeScrollEvent,
+  FlatList,
 } from 'react-native';
 import { TabBar, TabView } from 'react-native-tab-view';
 
@@ -59,6 +60,8 @@ function RankScreen() {
   const offsetAnimValue = useRef(0);
   const maxPositionOffset = useRef(0);
 
+  const productList = useRef<FlatList>(null);
+
   const [index, setIndex] = useState<IndexNums>(0);
 
   const onIndexChange = (nextIndex: number) => {
@@ -67,9 +70,12 @@ function RankScreen() {
 
   const changeOffset = (nextOffset: number) => {
     offsets[index] = nextOffset;
+    productList.current?.scrollToOffset({ offset: offsets[index], animated: true });
   };
 
   const onScrollBeginDrag = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+    console.log('onScrollBeginDrag');
+
     clearTimeout(animTimer.current);
     offsets[index] = Math.max(0, e.nativeEvent.contentOffset.y);
   };
@@ -100,10 +106,11 @@ function RankScreen() {
       case 'product':
         return (
           <ProductRank
-            paddingTop={PADDING_TOP}
+            ref={productList}
             isActive={index === 0}
             onScrollBeginDrag={onScrollBeginDrag}
             onScrollEndDrag={onScrollEndDrag}
+            paddingTop={PADDING_TOP}
           />
         );
       case 'store':
