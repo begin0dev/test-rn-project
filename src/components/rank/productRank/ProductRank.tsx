@@ -1,6 +1,12 @@
 import * as React from 'react';
 import { useContext, useRef, useState } from 'react';
-import { Dimensions, FlatList, Animated } from 'react-native';
+import {
+  Dimensions,
+  FlatList,
+  Animated,
+  NativeSyntheticEvent,
+  NativeScrollEvent,
+} from 'react-native';
 
 import ProductCard from '../productCard';
 import CustomHeaderContext from '../../../lib/contexts/CustomHeaderContext';
@@ -12,9 +18,11 @@ const colCount = width >= 575 ? 3 : 2;
 interface IProps {
   isActive: boolean;
   paddingTop: number;
+  onScrollBeginDrag: (e: NativeSyntheticEvent<NativeScrollEvent>) => void;
+  onScrollEndDrag: (e: NativeSyntheticEvent<NativeScrollEvent>) => void;
 }
 
-function ProductRank({ isActive, paddingTop }: IProps) {
+function ProductRank({ isActive, paddingTop, onScrollBeginDrag, onScrollEndDrag }: IProps) {
   const { scrollAnim } = useContext(CustomHeaderContext);
 
   const flatListEl = useRef<FlatList>(null);
@@ -40,8 +48,10 @@ function ProductRank({ isActive, paddingTop }: IProps) {
             })
           : undefined
       }
+      onScrollBeginDrag={onScrollBeginDrag}
+      onScrollEndDrag={onScrollEndDrag}
+      onMomentumScrollEnd={onScrollEndDrag}
       onEndReachedThreshold={2.5}
-      scrollEventThrottle={1}
       numColumns={colCount}
     />
   );
