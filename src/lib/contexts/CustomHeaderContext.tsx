@@ -7,7 +7,7 @@ import { sizeList } from '../helpers/size';
 interface CustomHeaderContextValue {
   scrollAnim: Animated.Value;
   offsetAnim: Animated.Value;
-  diffClampScroll: Animated.AnimatedAddition;
+  diffClampScroll: Animated.AnimatedDiffClamp;
 }
 
 const CustomHeaderContext = createContext<CustomHeaderContextValue>({

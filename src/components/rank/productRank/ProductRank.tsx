@@ -49,15 +49,10 @@ const ProductRank = forwardRef<FlatList, IProps>(
               })
             : undefined
         }
+        onMomentumScrollBegin={onScrollBeginDrag}
         onScrollBeginDrag={onScrollBeginDrag}
-        onScrollEndDrag={(e) => {
-          console.log('onScrollEndDrag');
-          onScrollEndDrag(e);
-        }}
-        onMomentumScrollEnd={(e) => {
-          console.log('onMomentumScrollEnd');
-          onScrollEndDrag(e);
-        }}
+        onScrollEndDrag={onScrollEndDrag}
+        scrollEventThrottle={8}
         onEndReachedThreshold={2.5}
         numColumns={colCount}
       />

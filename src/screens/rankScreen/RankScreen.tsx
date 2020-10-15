@@ -33,7 +33,7 @@ const TABBAR_HEIGHT = 47;
 const PADDING_TOP = sizeList.SEARCHBAR_HEIGHT + TABBAR_HEIGHT;
 
 function RankScreen() {
-  const { scrollAnim, diffClampScroll } = useContext(CustomHeaderContext);
+  const { scrollAnim, offsetAnim, diffClampScroll } = useContext(CustomHeaderContext);
 
   const translateY = useRef(
     diffClampScroll.interpolate({
@@ -51,14 +51,14 @@ function RankScreen() {
     }),
   ).current;
 
-  const animTimer = useRef(0);
+  const animTimer = useRef<number>(0);
   const offsets = useRef({
     0: 0,
     1: 0,
     2: 0,
   }).current;
-  const offsetAnimValue = useRef(0);
-  const maxPositionOffset = useRef(0);
+  const offsetAnimValue = useRef<number>(0);
+  const maxPositionOffset = useRef<number>(0);
 
   const productList = useRef<FlatList>(null);
 
@@ -69,13 +69,11 @@ function RankScreen() {
   };
 
   const changeOffset = (nextOffset: number) => {
-    offsets[index] = nextOffset;
     productList.current?.scrollToOffset({ offset: offsets[index], animated: true });
+    offsets[index] = nextOffset;
   };
 
   const onScrollBeginDrag = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
-    console.log('onScrollBeginDrag');
-
     clearTimeout(animTimer.current);
     offsets[index] = Math.max(0, e.nativeEvent.contentOffset.y);
   };
@@ -93,12 +91,20 @@ function RankScreen() {
       return;
     }
 
+    const diffValue = diffClampScroll.__getValue();
+    if ((diffValue === sizeList.SEARCHBAR_HEIGHT && diff > 0) || (diffValue === 0 && diff < 0)) {
+      offsets[index] = offsetY;
+      offsetAnimValue.current += diff > 0 ? sizeList.SEARCHBAR_HEIGHT : -sizeList.SEARCHBAR_HEIGHT;
+      offsetAnim.setValue(offsetAnimValue.current);
+      return;
+    }
+
     let nextOffset = offsets[index];
     if (Math.abs(diff) > sizeList.SEARCHBAR_HEIGHT / 3) {
       nextOffset += diff > 0 ? sizeList.SEARCHBAR_HEIGHT : -sizeList.SEARCHBAR_HEIGHT;
     }
 
-    animTimer.current = setTimeout(changeOffset, 100, nextOffset);
+    animTimer.current = setTimeout(changeOffset, 150, nextOffset);
   };
 
   const renderScene = ({ route }: { route: { key: string; title: string } }) => {
