@@ -1,6 +1,6 @@
 export enum sizeList {
   HEADER_HEIGHT = 60,
-  TABBAR_HEIGHT = 54,
   SEARCHBAR_HEIGHT = 69,
+  TABBAR_HEIGHT = 47,
   PADDING_HORIZONTAL = 18,
 }
