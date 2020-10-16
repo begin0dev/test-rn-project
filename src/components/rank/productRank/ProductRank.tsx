@@ -21,10 +21,11 @@ interface IProps {
   isActive: boolean;
   onScrollBeginDrag: (e: NativeSyntheticEvent<NativeScrollEvent>) => void;
   onScrollEndDrag: (e: NativeSyntheticEvent<NativeScrollEvent>) => void;
+  onMomentumScrollEnd: (e: NativeSyntheticEvent<NativeScrollEvent>) => void;
 }
 
 const ProductRank = forwardRef<FlatList, IProps>(
-  ({ isActive, onScrollBeginDrag, onScrollEndDrag }, ref) => {
+  ({ isActive, onScrollBeginDrag, onScrollEndDrag, onMomentumScrollEnd }, ref) => {
     const { scrollAnim } = useContext(CustomHeaderContext);
 
     const [products, setProducts] = useState<{ id: number }[]>(
@@ -48,11 +49,12 @@ const ProductRank = forwardRef<FlatList, IProps>(
               })
             : undefined
         }
-        onMomentumScrollBegin={onScrollBeginDrag}
         onScrollBeginDrag={onScrollBeginDrag}
         onScrollEndDrag={onScrollEndDrag}
-        scrollEventThrottle={8}
+        onMomentumScrollBegin={onScrollBeginDrag}
+        onMomentumScrollEnd={onMomentumScrollEnd}
         onEndReachedThreshold={2.5}
+        scrollEventThrottle={8}
         numColumns={colCount}
       />
     );

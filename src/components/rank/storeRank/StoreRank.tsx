@@ -11,12 +11,13 @@ interface IProps {
   storeGroup: 'default' | 'brand';
   onScrollBeginDrag: (e: NativeSyntheticEvent<NativeScrollEvent>) => void;
   onScrollEndDrag: (e: NativeSyntheticEvent<NativeScrollEvent>) => void;
+  onMomentumScrollEnd: (e: NativeSyntheticEvent<NativeScrollEvent>) => void;
 }
 
 const paddingTop = sizeList.SEARCHBAR_HEIGHT + sizeList.TABBAR_HEIGHT;
 
 const StoreRank = forwardRef<FlatList, IProps>(
-  ({ isActive, storeGroup, onScrollBeginDrag, onScrollEndDrag }, ref) => {
+  ({ isActive, storeGroup, onScrollBeginDrag, onScrollEndDrag, onMomentumScrollEnd }, ref) => {
     const { scrollAnim } = useContext(CustomHeaderContext);
 
     const [stores, setStores] = useState<{ id: number }[]>(
@@ -40,10 +41,12 @@ const StoreRank = forwardRef<FlatList, IProps>(
               })
             : undefined
         }
-        onMomentumScrollBegin={onScrollBeginDrag}
         onScrollBeginDrag={onScrollBeginDrag}
         onScrollEndDrag={onScrollEndDrag}
+        onMomentumScrollBegin={onScrollBeginDrag}
+        onMomentumScrollEnd={onMomentumScrollEnd}
         onEndReachedThreshold={2.5}
+        scrollEventThrottle={8}
       />
     );
   },
