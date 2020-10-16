@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useContext, useRef, useState, forwardRef } from 'react';
+import { useContext, useState, forwardRef } from 'react';
 import {
   Dimensions,
   FlatList,
@@ -10,23 +10,22 @@ import {
 
 import ProductCard from '../productCard';
 import CustomHeaderContext from '../../../lib/contexts/CustomHeaderContext';
+import { sizeList } from '../../../lib/helpers/size';
 
 const { width } = Dimensions.get('window');
 
+const paddingTop = sizeList.SEARCHBAR_HEIGHT + sizeList.TABBAR_HEIGHT;
 const colCount = width >= 575 ? 3 : 2;
 
 interface IProps {
   isActive: boolean;
-  paddingTop: number;
   onScrollBeginDrag: (e: NativeSyntheticEvent<NativeScrollEvent>) => void;
   onScrollEndDrag: (e: NativeSyntheticEvent<NativeScrollEvent>) => void;
 }
 
 const ProductRank = forwardRef<FlatList, IProps>(
-  ({ isActive, paddingTop, onScrollBeginDrag, onScrollEndDrag }, ref) => {
+  ({ isActive, onScrollBeginDrag, onScrollEndDrag }, ref) => {
     const { scrollAnim } = useContext(CustomHeaderContext);
-
-    // const flatListEl = useRef<FlatList>(null);
 
     const [products, setProducts] = useState<{ id: number }[]>(
       Array(200)
