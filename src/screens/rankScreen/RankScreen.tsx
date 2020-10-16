@@ -74,8 +74,8 @@ function RankScreen() {
   };
 
   const changeOffset = (nextOffset: number) => {
-    lists[index].current?.scrollToOffset({ offset: offsets[index], animated: true });
     offsets[index] = nextOffset;
+    lists[index].current?.scrollToOffset({ offset: offsets[index], animated: true });
   };
 
   const onScrollBeginDrag = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
@@ -109,7 +109,6 @@ function RankScreen() {
 
     let nextOffset = offsets[index];
     if (Math.abs(diff) > sizeList.SEARCHBAR_HEIGHT / 3) nextOffset += addOffset;
-
     animTimer.current = setTimeout(changeOffset, 150, nextOffset);
   };
 
