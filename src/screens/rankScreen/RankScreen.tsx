@@ -69,8 +69,10 @@ function RankScreen() {
   const maxPositionOffset = useRef<number>(0);
   const prevOpenStatus = useRef<boolean>(true);
   const isSwipe = useRef<boolean>(false);
+  const onScrollTop = useRef<boolean>(false);
 
   const [index, setIndex] = useState<IndexNums>(0);
+  const [isShowScrollTop, setIsShowScrollTop] = useState<boolean>(false);
 
   const syncInActiveTabOffset = () => {
     clearTimeout(animTimer.current);
@@ -112,6 +114,11 @@ function RankScreen() {
     syncInActiveTabOffset();
   };
 
+  const onClickScrollTop = () => {
+    onScrollTop.current = true;
+    lists[index].current?.scrollToOffset({ offset: 0, animated: true });
+  };
+
   const changeOffset = (nextOffset: number) => {
     offsets[index] = nextOffset;
     lists[index].current?.scrollToOffset({ offset: offsets[index], animated: true });
@@ -127,15 +134,20 @@ function RankScreen() {
     clearTimeout(animTimer.current);
 
     const offsetY = Math.max(0, e.nativeEvent.contentOffset.y);
+    // 바뀐게 없으면 return
     if (offsetY === offsets[index]) return;
 
     const diff = offsetY - offsets[index];
-    if (Math.abs(diff) > sizeList.SEARCHBAR_HEIGHT) {
+    const diffClampValue = (diffClampScroll as any).__getValue();
+    // diff 가 sizeList.SEARCHBAR_HEIGHT 보다 클 경우
+    if (
+      Math.abs(diff) > sizeList.SEARCHBAR_HEIGHT &&
+      (diffClampValue === 0 || diffClampValue === sizeList.SEARCHBAR_HEIGHT)
+    ) {
       offsets[index] = offsetY;
       return;
     }
 
-    const diffClampValue = (diffClampScroll as any).__getValue();
     const addOffset = diff > 0 ? sizeList.SEARCHBAR_HEIGHT : -sizeList.SEARCHBAR_HEIGHT;
     if (
       (diffClampValue === 0 && diff < 0) ||
@@ -205,6 +217,8 @@ function RankScreen() {
 
   useEffect(() => {
     scrollAnim.addListener(({ value }) => {
+      setIsShowScrollTop(value > height * 2);
+
       const offsetY = Math.max(0, value);
       const currentDiff = offsets[index] - offsetY;
       const prevDiff = offsets[index] - maxPositionOffset.current;
@@ -212,7 +226,6 @@ function RankScreen() {
       if (Math.abs(currentDiff) >= Math.abs(prevDiff)) {
         maxPositionOffset.current = offsetY;
       } else if (Math.abs(prevDiff) > sizeList.SEARCHBAR_HEIGHT) {
-        console.log('값변경', maxPositionOffset.current);
         offsets[index] = maxPositionOffset.current;
       }
     });
@@ -249,11 +262,13 @@ function RankScreen() {
         swipeEnabled
         lazy
       />
-      <TouchableWithoutFeedback>
-        <Animated.View style={[styles.scrollTop, { opacity }]}>
-          <ChevronUp width={22} height={22} color={palette.gray9} />
-        </Animated.View>
-      </TouchableWithoutFeedback>
+      {isShowScrollTop && (
+        <TouchableWithoutFeedback onPress={onClickScrollTop}>
+          <View style={[styles.scrollTop]}>
+            <ChevronUp width={22} height={22} color={palette.gray9} />
+          </View>
+        </TouchableWithoutFeedback>
+      )}
     </View>
   );
 }
