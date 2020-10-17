@@ -45,7 +45,7 @@ const StoreRank = forwardRef<FlatList, IProps>(
         onMomentumScrollEnd={onMomentumScrollEnd}
         onEndReachedThreshold={2.5}
         showsVerticalScrollIndicator={false}
-        scrollEventThrottle={8}
+        scrollEventThrottle={16}
       />
     );
   },

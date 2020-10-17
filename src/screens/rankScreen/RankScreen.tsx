@@ -40,14 +40,6 @@ function RankScreen() {
     }),
   ).current;
 
-  const opacity = useRef(
-    scrollAnim.interpolate({
-      inputRange: [height * 2 - 0.1, height * 2],
-      outputRange: [0, 1],
-      extrapolate: 'clamp',
-    }),
-  ).current;
-
   const productListEl = useRef<FlatList>(null);
   const storeListEl = useRef<FlatList>(null);
   const brandListEl = useRef<FlatList>(null);
@@ -69,20 +61,23 @@ function RankScreen() {
   const maxPositionOffset = useRef<number>(0);
   const prevOpenStatus = useRef<boolean>(true);
   const isSwipe = useRef<boolean>(false);
-  const onScrollTop = useRef<boolean>(false);
+  const isScrollTop = useRef<boolean>(false);
 
   const [index, setIndex] = useState<IndexNums>(0);
   const [isShowScrollTop, setIsShowScrollTop] = useState<boolean>(false);
 
   const syncInActiveTabOffset = () => {
     clearTimeout(animTimer.current);
+    clearTimeout(onMomentTimer.current);
+
+    isScrollTop.current = false;
+
     const diffClampValue = (diffClampScroll as any).__getValue();
 
     let addFixOffset = 0;
     if (prevOpenStatus.current && diffClampValue === sizeList.SEARCHBAR_HEIGHT) {
       addFixOffset = sizeList.SEARCHBAR_HEIGHT;
-    }
-    if (!prevOpenStatus.current && diffClampValue === 0) {
+    } else if (!prevOpenStatus.current && diffClampValue === 0) {
       addFixOffset = -sizeList.SEARCHBAR_HEIGHT;
     }
 
@@ -103,6 +98,7 @@ function RankScreen() {
 
     offsetAnimValue.current += offsets[index] - offsets[nextIndex as IndexNums];
     maxPositionOffset.current = offsets[nextIndex as IndexNums];
+
     scrollAnim.setValue(offsets[nextIndex as IndexNums]);
     offsetAnim.setValue(offsetAnimValue.current);
 
@@ -110,12 +106,13 @@ function RankScreen() {
   };
 
   const onSwipeStart = () => {
+    isScrollTop.current = false;
     isSwipe.current = true;
     syncInActiveTabOffset();
   };
 
   const onClickScrollTop = () => {
-    onScrollTop.current = true;
+    isScrollTop.current = true;
     lists[index].current?.scrollToOffset({ offset: 0, animated: true });
   };
 
@@ -127,6 +124,8 @@ function RankScreen() {
   const onScrollBeginDrag = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
     clearTimeout(animTimer.current);
     clearTimeout(onMomentTimer.current);
+
+    isScrollTop.current = false;
     offsets[index] = Math.max(0, e.nativeEvent.contentOffset.y);
   };
 
@@ -134,16 +133,14 @@ function RankScreen() {
     clearTimeout(animTimer.current);
 
     const offsetY = Math.max(0, e.nativeEvent.contentOffset.y);
+
     // 바뀐게 없으면 return
-    if (offsetY === offsets[index]) return;
+    if (offsetY === 0 || offsetY === offsets[index]) return;
 
     const diff = offsetY - offsets[index];
     const diffClampValue = (diffClampScroll as any).__getValue();
     // diff 가 sizeList.SEARCHBAR_HEIGHT 보다 클 경우
-    if (
-      Math.abs(diff) > sizeList.SEARCHBAR_HEIGHT &&
-      (diffClampValue === 0 || diffClampValue === sizeList.SEARCHBAR_HEIGHT)
-    ) {
+    if (Math.abs(diff) > sizeList.SEARCHBAR_HEIGHT) {
       offsets[index] = offsetY;
       return;
     }
@@ -220,6 +217,14 @@ function RankScreen() {
       setIsShowScrollTop(value > height * 2);
 
       const offsetY = Math.max(0, value);
+
+      // scroll top action return
+      if (isScrollTop.current) {
+        offsets[index] = offsetY;
+        maxPositionOffset.current = offsetY;
+        return;
+      }
+
       const currentDiff = offsets[index] - offsetY;
       const prevDiff = offsets[index] - maxPositionOffset.current;
 

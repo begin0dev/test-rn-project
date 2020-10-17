@@ -53,7 +53,7 @@ const ProductRank = forwardRef<FlatList, IProps>(
         onMomentumScrollEnd={onMomentumScrollEnd}
         onEndReachedThreshold={2.5}
         showsVerticalScrollIndicator={false}
-        scrollEventThrottle={8}
+        scrollEventThrottle={16}
         numColumns={colCount}
       />
     );
