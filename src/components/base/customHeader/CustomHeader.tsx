@@ -18,8 +18,6 @@ const { width } = Dimensions.get('window');
 function CustomHeader() {
   const { diffClampScroll } = useContext(CustomHeaderContext);
 
-  const [searchBarHeight, setSearchBarHeight] = useState(0);
-
   const route = useRoute<RouteProp<InitNavigation, 'HomeScreen'>>();
   const tabName = getFocusedRouteNameFromRoute(route) || 'Rank';
 
@@ -35,8 +33,10 @@ function CustomHeader() {
     diffClampScroll.interpolate({
       inputRange: [0, sizeList.SEARCHBAR_HEIGHT],
       outputRange: [
-        sizeList.HEADER_HEIGHT,
-        Math.floor((searchBarHeight - searchBarHeight * 0.8) / 2),
+        sizeList.HEADER_HEIGHT +
+          Math.floor((sizeList.SEARCHBAR_HEIGHT - sizeList.HEADER_HEIGHT) / 2) -
+          2,
+        Math.floor(((sizeList.SEARCHBAR_HEIGHT - sizeList.HEADER_HEIGHT) / 2) * 0.8),
       ],
       extrapolate: 'clamp',
     }),
@@ -84,7 +84,6 @@ function CustomHeader() {
               { transform: [{ translateX }, { translateY }, { scaleX }, { scaleY }] },
             ]}>
             <SearchTextBox
-              onLayout={(e) => setSearchBarHeight(e.nativeEvent.layout.height)}
               placeholder="검색어를 입력해 주세요"
               style={styles.searchBar}
               editable={false}

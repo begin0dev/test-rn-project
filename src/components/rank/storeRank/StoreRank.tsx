@@ -33,7 +33,6 @@ const StoreRank = forwardRef<FlatList, IProps>(
         keyExtractor={(item) => `${storeGroup}_${item.id}`}
         renderItem={({ item }) => <StoreCard store={item} />}
         contentContainerStyle={{ paddingTop }}
-        showsVerticalScrollIndicator={false}
         onScroll={
           isActive
             ? Animated.event([{ nativeEvent: { contentOffset: { y: scrollAnim } } }], {
@@ -43,9 +42,9 @@ const StoreRank = forwardRef<FlatList, IProps>(
         }
         onScrollBeginDrag={onScrollBeginDrag}
         onScrollEndDrag={onScrollEndDrag}
-        onMomentumScrollBegin={onScrollBeginDrag}
         onMomentumScrollEnd={onMomentumScrollEnd}
         onEndReachedThreshold={2.5}
+        showsVerticalScrollIndicator={false}
         scrollEventThrottle={8}
       />
     );
